@@ -1,4 +1,12 @@
-import {convertToUpperTriangle, enterMatrix, printMatrixAsFunctions, printSeparator, renderMatrix} from "./utils.js";
+import {
+    concatMatrices,
+    convertToUpperTriangle, deConcatMatrices,
+    enterMatrix,
+    printMatrixAsFunctions,
+    printSeparator,
+    renderMatrix,
+    vecToMatrix
+} from "./utils.js";
 
 export async function gauss() {
     console.log('Решение системы линейных уравнений методом Гаусса');
@@ -6,6 +14,8 @@ export async function gauss() {
     let {bVec, matrixA, size} = await enterMatrix(true);
 
     bVec = bVec!;
+
+    let bMatrix = vecToMatrix(bVec);
 
     printSeparator();
 
@@ -20,7 +30,7 @@ export async function gauss() {
 
     printSeparator(true);
 
-    convertToUpperTriangle(matrixA, size, bVec);
+    [matrixA, bMatrix] = deConcatMatrices(convertToUpperTriangle(concatMatrices(matrixA, bMatrix)));
 
     console.log(`Находим неизвестные переменные, начиная с последней строки.`);
 
@@ -34,12 +44,12 @@ export async function gauss() {
             sum += matrixA[i][j] * x[j];
         }
 
-        x[i] = (bVec[i] - sum) / matrixA[i][i];
+        x[i] = (bMatrix[i][0] - sum) / matrixA[i][i];
 
         if (entries.length === 0) {
-            console.log(`X${i + 1} = ${bVec[i].toFixed(4)} / ${matrixA[i][i].toFixed(4)} = ${x[i].toFixed(4)}`);
+            console.log(`X${i + 1} = ${bMatrix[i][0].toFixed(4)} / ${matrixA[i][i].toFixed(4)} = ${x[i].toFixed(4)}`);
         } else {
-            console.log(`X${i + 1} = (${bVec[i].toFixed(4)} - ${entries.join(' + ')}) / ${matrixA[i][i].toFixed(4)} = ${x[i].toFixed(4)}`);
+            console.log(`X${i + 1} = (${bMatrix[i][0].toFixed(4)} - ${entries.join(' + ')}) / ${matrixA[i][i].toFixed(4)} = ${x[i].toFixed(4)}`);
         }
     }
 
@@ -56,8 +66,8 @@ export async function gauss() {
         for (let j = 0; j < size; j++) {
             result += matrixA[i][j] * x[j];
         }
-        const diff = bVec[i] - result;
-        console.log(`Результат для строки #${i + 1}: ${result.toFixed(4)} (ожидалось ${bVec[i].toFixed(4)}), невязка: ${diff.toFixed(4)}`);
+        const diff = bMatrix[i][0] - result;
+        console.log(`Результат для строки #${i + 1}: ${result.toFixed(4)} (ожидалось ${bMatrix[i][0].toFixed(4)}), невязка: ${diff.toFixed(4)}`);
     }
 
     console.log('\nКонец решения.\n');

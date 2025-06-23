@@ -3,7 +3,7 @@ import {convertToUpperTriangle, enterMatrix, printSeparator, renderMatrix} from 
 export async function determinant() {
     console.log('Вычисление определителя матрицы методом Гаусса');
 
-    let {matrixA, size} = await enterMatrix(false);
+    let {matrixA} = await enterMatrix(false);
 
     printSeparator();
 
@@ -17,7 +17,7 @@ export async function determinant() {
 
     printSeparator(true);
 
-    convertToUpperTriangle(matrixA, size);
+    convertToUpperTriangle(matrixA);
 
     console.log('Находим определитель матрицы, перемножая элементы главной диагонали:');
 
