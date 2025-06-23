@@ -13,79 +13,111 @@ export function printSeparator(emptyLine: boolean = false) {
     console.log('...');
 }
 
-export async function enterMatrix(isBVecRequired: boolean): Promise<{
-    bVec?: Vec,
-    matrixA: Matrix,
-    size: number
-}> {
+export async function askForDataInputType(onCustomMatrix: () => void, onTaskData: () => void) {
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
     });
 
-    let size: number;
-    let matrixA: Matrix = [];
-    let bVec: Vec = [];
-
-    let customTableOrFromTask: number;
     while (true) {
-        customTableOrFromTask = +await rl.question('Вы хотите ввести матрицу вручную (1) или использовать данные из задания (2)?: ');
-        if ([1, 2].includes(customTableOrFromTask)) break;
-        console.log('Некорректный ввод. Пожалуйста, введите 1 или 2.');
+        const answer = await rl.question('Вы хотите ввести матрицу вручную (1) или использовать данные из задания (2)?: ');
+
+        if (answer === '1') {
+            rl.close();
+            return onCustomMatrix();
+        } else if (answer === '2') {
+            rl.close();
+            return onTaskData();
+        } else {
+            console.log('Некорректный ввод. Пожалуйста, введите 1 или 2.');
+        }
     }
+}
 
-    if (customTableOrFromTask === 1) {
-        console.log('Вы выбрали ввод матрицы вручную.');
-        size = +await rl.question('Введите порядок системы: ');
-        for (let i = 0; i < size; i++) {
-            for (let j = 0; j < size; j++) {
-                const value = +await rl.question(`Введите значение элемента матрицы A[${i + 1}][${j + 1}]: `);
+export async function askForMatrixSize(): Promise<number> {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
 
-                if (Number.isNaN(value)) {
-                    console.log('Некорректный ввод. Пожалуйста, введите число.');
-                    j--; // Повторяем ввод для текущего элемента
-                } else {
-                    if (!matrixA[i]) {
-                        matrixA[i] = [];
-                    }
+    while (true) {
+        const answer = +await rl.question('Введите порядок системы: ');
+        if (Number.isInteger(answer) && answer > 0) {
+            rl.close();
+            return answer;
+        } else {
+            console.log('Некорректный ввод. Пожалуйста, введите положительное целое число.');
+        }
+    }
+}
 
-                    matrixA[i][j] = value;
+export async function askForCustomMatrix(size: number): Promise<Matrix> {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
+
+    const matrixA: Matrix = [];
+
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+            const value = +await rl.question(`Введите значение элемента матрицы A[${i + 1}][${j + 1}]: `);
+
+            if (Number.isNaN(value)) {
+                console.log('Некорректный ввод. Пожалуйста, введите число.');
+                j--; // Повторяем ввод для текущего элемента
+            } else {
+                if (!matrixA[i]) {
+                    matrixA[i] = [];
                 }
+
+                matrixA[i][j] = value;
             }
         }
-
-        if (isBVecRequired) {
-            for (let i = 0; i < size; i++) {
-                const value = +await rl.question(`Введите значение правой части системы b #${i + 1}: `);
-
-                if (Number.isNaN(value)) {
-                    console.log('Некорректный ввод. Пожалуйста, введите число.');
-                    i--;
-                } else {
-                    bVec.push(value);
-                }
-            }
-        }
-    } else {
-        console.log('Вы выбрали данные из задания.');
-        size = 3;
-
-        matrixA = [
-            [6, -1, -1],
-            [-1, 6, -1],
-            [-1, -1, 6]
-        ];
-
-        bVec = [-11.33, 32, 42];
     }
 
     rl.close();
+    return matrixA;
+}
 
-    if (isBVecRequired) {
-        return {bVec, matrixA, size};
+export async function askForBVec(size: number): Promise<Vec> {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
+
+    const bVec: Vec = [];
+
+
+    for (let i = 0; i < size; i++) {
+        const value = +await rl.question(`Введите значение правой части системы b #${i + 1}: `);
+
+        if (Number.isNaN(value)) {
+            console.log('Некорректный ввод. Пожалуйста, введите число.');
+            i--;
+        } else {
+            bVec.push(value);
+        }
     }
 
-    return {matrixA, size};
+    rl.close();
+    return bVec;
+}
+
+export function getTaskData(): {
+    bVec: Vec,
+    matrixA: Matrix,
+    size: number
+} {
+    return {
+        size: 3,
+        matrixA: [
+            [6, -1, -1],
+            [-1, 6, -1],
+            [-1, -1, 6]
+        ],
+        bVec: [-11.33, 32, 42]
+    };
 }
 
 export function vecToMatrix(vec: Vec): Matrix {
@@ -124,27 +156,7 @@ export function renderMatrices(matrixA: Matrix, title: string = 'Матрица:
     console.log(`${title}${result}`);
 }
 
-
-export function renderMatrix(matrixA: Matrix, bVec?: Vec) {
-    if (!bVec) {
-        console.log(`Матрица A
-${matrixA.map(row => `${row.map(value => `${value.toFixed(2)}`.padEnd(8)).join('')}`).join('\n')}
-`);
-        return;
-    }
-
-    console.log(`Матрица A и вектор b:
-${matrixA.map((row, ri) => `${row.map(value => `${value.toFixed(2)}`.padEnd(8)).join('')} | ${bVec[ri].toFixed(2)}`).join('\n')}
-`);
-}
-
-export function renderTwoMatrix(matrixA: Matrix, matrixE: Matrix) {
-    console.log(`Матрица A | матрица E:
-${matrixA.map((row, ri) => `${row.map(value => `${value.toFixed(2)}`.padEnd(8)).join('')} | ${matrixE[ri].map(value => `${value.toFixed(2)}`.padEnd(8)).join('')}`).join('\n')}
-`);
-}
-
-export function printMatrixAsFunctions(matrixA: Matrix, bVec: Vec) {
+export function printAsFunctions(matrixA: Matrix, bVec: Vec) {
     console.log(`{
   ${matrixA.map((row, ri) => `${row.map((c, i) => `${c >= 0 && i > 0 ? '+' : ''}${c}X${i + 1}`).join('')}=${bVec[ri]}`).join('\n  ')}
 }

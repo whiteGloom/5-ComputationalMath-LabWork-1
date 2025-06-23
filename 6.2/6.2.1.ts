@@ -1,28 +1,48 @@
 import {
+    askForBVec,
+    askForCustomMatrix,
+    askForDataInputType,
+    askForMatrixSize,
     concatMatrices,
-    convertToUpperTriangle, deConcatMatrices,
-    enterMatrix,
-    printMatrixAsFunctions,
+    convertToUpperTriangle,
+    deConcatMatrices,
+    getTaskData,
+    Matrix,
+    printAsFunctions,
     printSeparator,
-    renderMatrix,
+    renderMatrices,
+    Vec,
     vecToMatrix
 } from "./utils.js";
 
 export async function gauss() {
     console.log('Решение системы линейных уравнений методом Гаусса');
 
-    let {bVec, matrixA, size} = await enterMatrix(true);
+    let matrixA: Matrix;
+    let bVec: Vec;
 
+    await askForDataInputType(async () => {
+        const size = await askForMatrixSize();
+        matrixA = await askForCustomMatrix(size);
+        bVec = await askForBVec(size);
+    }, () => {
+        const data = getTaskData();
+        matrixA = data.matrixA;
+        bVec = data.bVec;
+    });
+
+    matrixA = matrixA!;
     bVec = bVec!;
+    const size = matrixA.length;
 
     let bMatrix = vecToMatrix(bVec);
 
     printSeparator();
 
     console.log(`Демонстрация введённых данных:`);
-    printMatrixAsFunctions(matrixA, bVec);
+    printAsFunctions(matrixA, bVec);
 
-    renderMatrix(matrixA, bVec);
+    renderMatrices(concatMatrices(matrixA, bMatrix));
 
     printSeparator(true);
 

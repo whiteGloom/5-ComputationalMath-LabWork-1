@@ -1,8 +1,9 @@
 import {
+    askForCustomMatrix,
+    askForDataInputType, askForMatrixSize,
     concatMatrices,
     convertToUpperTriangle,
-    deConcatMatrices,
-    enterMatrix,
+    deConcatMatrices, getTaskData,
     Matrix,
     printSeparator,
     renderMatrices
@@ -11,7 +12,17 @@ import {
 export async function revertMatrix() {
     console.log('Вычисление определителя матрицы методом Гаусса');
 
-    let {matrixA, size} = await enterMatrix(false);
+    let matrixA: Matrix;
+
+    await askForDataInputType(async () => {
+        const size = await askForMatrixSize();
+        matrixA = await askForCustomMatrix(size);
+    }, () => {
+        matrixA = getTaskData().matrixA;
+    });
+
+    matrixA = matrixA!;
+    const size = matrixA.length;
 
     printSeparator();
 

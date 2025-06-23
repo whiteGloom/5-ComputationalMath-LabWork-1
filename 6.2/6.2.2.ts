@@ -1,15 +1,33 @@
-import {convertToUpperTriangle, enterMatrix, printSeparator, renderMatrix} from "./utils.js";
+import {
+    askForCustomMatrix,
+    askForDataInputType,
+    askForMatrixSize,
+    convertToUpperTriangle,
+    getTaskData,
+    Matrix,
+    printSeparator,
+    renderMatrices
+} from "./utils.js";
 
 export async function determinant() {
     console.log('Вычисление определителя матрицы методом Гаусса');
 
-    let {matrixA} = await enterMatrix(false);
+    let matrixA: Matrix;
+
+    await askForDataInputType(async () => {
+        const size = await askForMatrixSize();
+        matrixA = await askForCustomMatrix(size);
+    }, () => {
+        matrixA = getTaskData().matrixA;
+    });
+
+    matrixA = matrixA!;
 
     printSeparator();
 
     console.log(`Демонстрация введённых данных:`);
 
-    renderMatrix(matrixA);
+    renderMatrices(matrixA);
 
     printSeparator(true);
 
