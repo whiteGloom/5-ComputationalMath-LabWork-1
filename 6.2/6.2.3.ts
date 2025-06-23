@@ -1,9 +1,11 @@
 import {
     askForCustomMatrix,
-    askForDataInputType, askForMatrixSize,
+    askForDataInputType,
+    askForMatrixSize,
     concatMatrices,
     convertToUpperTriangle,
-    deConcatMatrices, getTaskData,
+    deConcatMatrices,
+    getTaskData,
     Matrix,
     printSeparator,
     renderMatrices
@@ -22,6 +24,7 @@ export async function revertMatrix() {
     });
 
     matrixA = matrixA!;
+    const originalMatrix = matrixA;
     const size = matrixA.length;
 
     printSeparator();
@@ -97,6 +100,45 @@ export async function revertMatrix() {
             }
         }
     }
+
+    console.log('Преобразования завершены.');
+    printSeparator(true);
+
+    renderMatrices(originalMatrix, 'Оригинальная матрица:\n');
+    printSeparator(true);
+
+    renderMatrices(identityMatrix, 'Обратная матрица:\n');
+    printSeparator(true);
+
+    console.log('Проверим результат, умножив исходную матрицу на обратную:');
+    const resultMatrix: Matrix = [];
+
+    for (let i = 0; i < size; i++) {
+        resultMatrix[i] = [];
+
+        for (let j = 0; j < size; j++) {
+            resultMatrix[i][j] = 0;
+            for (let k = 0; k < size; k++) {
+                resultMatrix[i][j] += originalMatrix[i][k] * identityMatrix[k][j];
+            }
+        }
+    }
+
+    renderMatrices(resultMatrix, 'Результат перемножения оригинальной и обратной матрицы:\n');
+
+    printSeparator(true);
+    console.log('Выведем значение невязки (разница между единичной матрицей и результатом перемножения оригинальной и обратной матрицы):');
+
+    const diffMatrix: Matrix = [];
+    for (let i = 0; i < size; i++) {
+        diffMatrix[i] = [];
+
+        for (let j = 0; j < size; j++) {
+            diffMatrix[i][j] = (i === j ? 1 : 0) - resultMatrix[i][j];
+        }
+    }
+
+    renderMatrices(diffMatrix, 'Матрица невязки:\n');
 
     console.log('\nКонец решения.\n');
 }
