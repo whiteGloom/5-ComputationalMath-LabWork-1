@@ -1,15 +1,9 @@
-import {
-    convertToUpperTriangle,
-    enterMatrixFromTask,
-    printMatrixAsFunctions,
-    printSeparator,
-    renderMatrix
-} from "./utils.js";
+import {convertToUpperTriangle, enterMatrix, printMatrixAsFunctions, printSeparator, renderMatrix} from "./utils.js";
 
 export async function gauss() {
     console.log('Решение системы линейных уравнений методом Гаусса');
 
-    let {bVec, matrixA, size} = await enterMatrixFromTask(true);
+    let {bVec, matrixA, size} = await enterMatrix(true);
 
     bVec = bVec!;
 
