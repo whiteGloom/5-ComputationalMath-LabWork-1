@@ -48,11 +48,11 @@ function dichotomy(targetFunc: (x: number) => number, a: number, b: number, argu
         console.log(`Обнаружен корень функции с заданной точностью аргумента и функции на итерации № ${iteration}:`);
         console.log(`Количество вычислений функции: ${funcCallsCount}`);
         console.log(`Время счёта: ${(performance.now() - startTimeStamp).toFixed(3)} мс`);
-        console.log(`Левая граница интервала: ${left.toFixed(3)}`);
-        console.log(`Правая граница интервала: ${right.toFixed(3)}`);
+        console.log(`Левая граница интервала: ${left}`);
+        console.log(`Правая граница интервала: ${right}`);
         console.log(`Текущая точность аргумента: ${right - left}`);
         console.log(`Порядок сходимости: 0.5`);
-        console.log(`x = ${middle.toFixed(3)}, f(x) = ${valueAtMiddle.toFixed(3)}`);
+        console.log(`x = ${middle}, f(x) = ${valueAtMiddle}`);
     }
 
     if (valueAtLeft === 0) {
